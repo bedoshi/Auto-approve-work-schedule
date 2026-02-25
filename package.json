@@ -1,0 +1,12 @@
+{
+  "name": "auto-approve-work-schedule",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node ./node_modules/jest/bin/jest.js"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  }
+}

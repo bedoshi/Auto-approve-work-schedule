@@ -1,4 +1,4 @@
-(async () => {
+async function runApproval() {
   // 日次ページの承認ボタンを全取得（テキストが「承認」のものに絞り込む）
   const approvalButtons = Array.from(document.querySelectorAll('button.MuiButton-outlined'))
     .filter((btn) => btn.textContent.trim() === '承認');
@@ -59,4 +59,10 @@
     success: failCount === 0,
     message: `処理完了 - 成功: ${successCount}件、失敗: ${failCount}件`,
   };
-})();
+}
+
+if (typeof module !== 'undefined') {
+  module.exports = { runApproval };
+} else {
+  runApproval();
+}

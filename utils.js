@@ -35,3 +35,7 @@ async function waitForModalClose(timeout = 5000) {
   }
   throw new Error(`モーダルが閉じませんでした (${timeout}ms 経過)`);
 }
+
+if (typeof module !== 'undefined') {
+  module.exports = { sleep, waitForElement, waitForModalClose };
+}
