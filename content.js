@@ -1,49 +1,62 @@
 (async () => {
-  // ----------------------------------------------------------------
-  // ユーティリティ
-  // ----------------------------------------------------------------
+  // 日次ページの承認ボタンを全取得（テキストが「承認」のものに絞り込む）
+  const approvalButtons = Array.from(document.querySelectorAll('button.MuiButton-outlined'))
+    .filter((btn) => btn.textContent.trim() === '承認');
 
-  /** 指定ミリ秒待機 */
-  function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+  console.log(`Found ${approvalButtons.length} approval buttons`);
+
+  if (approvalButtons.length === 0) {
+    return { success: false, message: '承認ボタンが見つかりませんでした' };
   }
 
-  /**
-   * セレクタが見つかるまで最大 timeout ms 待つ
-   * @param {string} selector
-   * @param {number} timeout
-   * @returns {Element|null}
-   */
-  async function waitForElement(selector, timeout = 5000) {
-    const interval = 200;
-    let elapsed = 0;
-    while (elapsed < timeout) {
-      const el = document.querySelector(selector);
-      if (el) return el;
-      await sleep(interval);
-      elapsed += interval;
+  let successCount = 0;
+  let failCount = 0;
+
+  for (let i = 0; i < approvalButtons.length; i++) {
+    console.log(`Processing approval ${i + 1}/${approvalButtons.length}`);
+
+    try {
+      // hidden input から日付を取得（ログ用）
+      const form = approvalButtons[i].closest('form');
+      const workYMD = form?.querySelector('input[name="workYMD"]')?.value ?? '不明';
+
+      // 承認ボタンをクリック
+      approvalButtons[i].click();
+
+      // モーダルが開くのを待つ
+      const modal = await waitForElement('.MuiDialog-root[role="presentation"]');
+
+      // モーダル内の承認ボタン（MuiButton-contained）を探してクリック
+      console.log('Modal opened, clicking confirm button');
+      const modalButton = Array.from(modal.querySelectorAll('button.MuiButton-contained'))
+        .find((btn) => btn.textContent.trim() === '承認');
+
+      if (!modalButton) {
+        throw new Error('モーダル内の承認ボタンが見つかりませんでした');
+      }
+
+      modalButton.click();
+
+      // モーダルが閉じるのを待つ
+      await waitForModalClose();
+      console.log('Modal closed');
+
+      // 次の処理前に 500ms 待機
+      await sleep(500);
+
+      successCount++;
+      console.log(`Approval ${i + 1} completed (workYMD: ${workYMD})`);
+    } catch (err) {
+      failCount++;
+      console.error(`Approval ${i + 1} failed: ${err.message}`);
     }
-    return null;
   }
 
-  // ----------------------------------------------------------------
-  // メイン処理
-  // ----------------------------------------------------------------
-  try {
-    // TODO: 実際の勤務表システムに合わせてセレクタ・ロジックを実装する
+  console.log('All approvals processed');
+  console.log(`Success: ${successCount}, Failed: ${failCount}`);
 
-    // 例: 承認ボタンをすべて取得してクリック
-    // const approveButtons = document.querySelectorAll('セレクタ');
-    // for (const btn of approveButtons) {
-    //   btn.click();
-    //   const modalConfirm = await waitForElement('モーダル確認ボタンのセレクタ');
-    //   if (!modalConfirm) throw new Error('確認モーダルが表示されませんでした');
-    //   modalConfirm.click();
-    //   await sleep(500);
-    // }
-
-    return { success: true, message: '承認処理が完了しました' };
-  } catch (err) {
-    return { success: false, message: err.message };
-  }
+  return {
+    success: failCount === 0,
+    message: `処理完了 - 成功: ${successCount}件、失敗: ${failCount}件`,
+  };
 })();

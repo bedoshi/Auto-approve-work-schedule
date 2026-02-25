@@ -15,7 +15,7 @@ btn.addEventListener('click', async () => {
 
     const results = await chrome.scripting.executeScript({
       target: { tabId: tab.id },
-      files: ['content.js'],
+      files: ['utils.js', 'content.js'],
     });
 
     const result = results?.[0]?.result;
