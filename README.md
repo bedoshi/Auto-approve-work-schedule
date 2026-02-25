@@ -56,15 +56,41 @@
 ### 必要な環境
 - Chrome browser (バージョン88以降推奨)
 - Manifest V3対応
+- Node.js（テスト実行用）
+
+### テスト
+
+依存パッケージのインストール:
+
+```bash
+npm install
+```
+
+テスト実行:
+
+```bash
+npm test
+```
+
+テストフレームワーク: [Jest](https://jestjs.io/) + jsdom
+
+| テストファイル | 対象 |
+|---|---|
+| `__tests__/utils.test.js` | `sleep` / `waitForElement` / `waitForModalClose` |
+| `__tests__/content.test.js` | `runApproval`（承認処理のメインロジック） |
 
 ### ファイル構成
 
 ```
-chrome-extension-approval/
-├── manifest.json   # Manifest V3 設定
-├── popup.html      # 拡張機能のポップアップ UI
-├── popup.js        # ポップアップのボタン制御・スクリプト注入
-├── utils.js        # 共通ユーティリティ（sleep / waitForElement / waitForModalClose）
-├── content.js      # 承認処理のメインロジック
+├── manifest.json         # Manifest V3 設定
+├── popup.html            # 拡張機能のポップアップ UI
+├── popup.js              # ポップアップのボタン制御・スクリプト注入
+├── utils.js              # 共通ユーティリティ（sleep / waitForElement / waitForModalClose）
+├── content.js            # 承認処理のメインロジック
+├── package.json          # npm 設定・テストスクリプト
+├── jest.config.js        # Jest 設定
+├── __tests__/
+│   ├── utils.test.js     # utils.js のテスト
+│   └── content.test.js   # content.js のテスト
 └── README.md
 ```
