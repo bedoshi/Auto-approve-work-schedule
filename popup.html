@@ -48,10 +48,32 @@
     #status.success {
       color: #188038;
     }
+
+    #mode-selector {
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    #mode-selector label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <h1>勤務表自動承認</h1>
+  <div id="mode-selector">
+    <label>
+      <input type="radio" name="approval-mode" value="single" checked> 1件のみ処理
+    </label>
+    <label>
+      <input type="radio" name="approval-mode" value="all"> まとめて処理
+    </label>
+  </div>
   <button id="start-btn">承認処理開始</button>
   <div id="status"></div>
   <script src="popup.js"></script>

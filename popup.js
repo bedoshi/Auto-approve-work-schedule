@@ -12,6 +12,13 @@ btn.addEventListener('click', async () => {
 
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    const mode = document.querySelector('input[name="approval-mode"]:checked').value;
+
+    await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      func: (m) => { window.__approvalMode = m; },
+      args: [mode],
+    });
 
     const results = await chrome.scripting.executeScript({
       target: { tabId: tab.id },
