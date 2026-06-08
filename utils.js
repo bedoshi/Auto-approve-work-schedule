@@ -21,7 +21,7 @@ async function waitForElement(selector, timeout = 5000) {
 
 /**
  * 親要素内でセレクタとテキストに一致するボタンが出現するまで待つ
- * @param {Element} parent
+ * @param {Document|Element} parent
  * @param {string} selector
  * @param {string} text
  * @param {number} timeout - ミリ秒

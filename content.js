@@ -23,12 +23,13 @@ async function runApproval() {
       // 承認ボタンをクリック
       approvalButtons[i].click();
 
-      // モーダルが開くのを待つ
-      const modal = await waitForElement('.MuiDialog-root[role="presentation"]');
-
       // モーダル内の「承認」テキストを持つボタンが描画されるまで待つ
-      console.log('Modal opened, waiting for confirm button');
-      const modalButton = await waitForButtonWithText(modal, 'button.MuiButton-containedPrimary', '承認');
+      console.log('Waiting for modal confirm button');
+      const modalButton = await waitForButtonWithText(
+        document,
+        '.MuiDialog-root[role="presentation"] button.MuiButton-containedPrimary',
+        '承認'
+      );
 
       console.log('Clicking confirm button');
       modalButton.click();
