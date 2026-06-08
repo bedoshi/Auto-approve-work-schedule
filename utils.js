@@ -20,6 +20,25 @@ async function waitForElement(selector, timeout = 5000) {
 }
 
 /**
+ * 親要素内でセレクタとテキストに一致するボタンが出現するまで待つ
+ * @param {Element} parent
+ * @param {string} selector
+ * @param {string} text
+ * @param {number} timeout - ミリ秒
+ * @returns {Promise<Element>}
+ */
+async function waitForButtonWithText(parent, selector, text, timeout = 5000) {
+  const startTime = Date.now();
+  while (Date.now() - startTime < timeout) {
+    const btn = Array.from(parent.querySelectorAll(selector))
+      .find((el) => el.textContent.trim() === text);
+    if (btn) return btn;
+    await sleep(100);
+  }
+  throw new Error(`ボタンが見つかりません: "${text}" (${timeout}ms 経過)`);
+}
+
+/**
  * モーダルが閉じるまで待つ
  * @param {number} timeout - ミリ秒
  * @returns {Promise<void>}
@@ -37,5 +56,5 @@ async function waitForModalClose(timeout = 5000) {
 }
 
 if (typeof module !== 'undefined') {
-  module.exports = { sleep, waitForElement, waitForModalClose };
+  module.exports = { sleep, waitForElement, waitForButtonWithText, waitForModalClose };
 }

@@ -26,15 +26,11 @@ async function runApproval() {
       // モーダルが開くのを待つ
       const modal = await waitForElement('.MuiDialog-root[role="presentation"]');
 
-      // モーダル内の承認ボタン（MuiButton-contained）を探してクリック
-      console.log('Modal opened, clicking confirm button');
-      const modalButton = Array.from(modal.querySelectorAll('button.MuiButton-contained'))
-        .find((btn) => btn.textContent.trim() === '承認');
+      // モーダル内の「承認」テキストを持つボタンが描画されるまで待つ
+      console.log('Modal opened, waiting for confirm button');
+      const modalButton = await waitForButtonWithText(modal, 'button.MuiButton-containedPrimary', '承認');
 
-      if (!modalButton) {
-        throw new Error('モーダル内の承認ボタンが見つかりませんでした');
-      }
-
+      console.log('Clicking confirm button');
       modalButton.click();
 
       // モーダルが閉じるのを待つ
