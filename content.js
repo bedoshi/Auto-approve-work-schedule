@@ -1,27 +1,30 @@
 async function runApproval() {
-  // 日次ページの承認ボタンを全取得（テキストが「承認」のものに絞り込む）
-  const approvalButtons = Array.from(document.querySelectorAll('button.MuiButton-containedPrimary'))
-    .filter((btn) => btn.textContent.trim() === '承認');
+  const findNextButton = () =>
+    Array.from(document.querySelectorAll('button.MuiButton-containedPrimary'))
+      .find((btn) => btn.textContent.trim() === '承認') ?? null;
 
-  console.log(`Found ${approvalButtons.length} approval buttons`);
-
-  if (approvalButtons.length === 0) {
+  if (!findNextButton()) {
     return { success: false, message: '承認ボタンが見つかりませんでした' };
   }
 
   let successCount = 0;
   let failCount = 0;
+  let i = 0;
 
-  for (let i = 0; i < approvalButtons.length; i++) {
-    console.log(`Processing approval ${i + 1}/${approvalButtons.length}`);
+  while (true) {
+    const approvalButton = findNextButton();
+    if (!approvalButton) break;
+
+    i++;
+    console.log(`Processing approval ${i}`);
 
     try {
       // hidden input から日付を取得（ログ用）
-      const form = approvalButtons[i].closest('form');
+      const form = approvalButton.closest('form');
       const workYMD = form?.querySelector('input[name="workYMD"]')?.value ?? '不明';
 
       // 承認ボタンをクリック
-      approvalButtons[i].click();
+      approvalButton.click();
 
       // モーダル内の「承認」テキストを持つボタンが描画されるまで待つ
       console.log('Waiting for modal confirm button');
@@ -42,10 +45,10 @@ async function runApproval() {
       await sleep(500);
 
       successCount++;
-      console.log(`Approval ${i + 1} completed (workYMD: ${workYMD})`);
+      console.log(`Approval ${i} completed (workYMD: ${workYMD})`);
     } catch (err) {
       failCount++;
-      console.error(`Approval ${i + 1} failed: ${err.message}`);
+      console.error(`Approval ${i} failed: ${err.message}`);
     }
   }
 
