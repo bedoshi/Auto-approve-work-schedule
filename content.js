@@ -3,7 +3,10 @@ async function runApproval() {
     .some((el) => el.textContent.trim() === '予定申請済');
 
   if (!hasScheduledBadge) {
-    return { success: false, message: '予定申請済が見つかりませんでした。承認処理を中止します。' };
+    const proceed = window.confirm('「予定申請済」が見つかりません。このまま承認処理を続けますか？');
+    if (!proceed) {
+      return { success: false, message: '予定申請済が見つかりませんでした。承認処理を中止しました。' };
+    }
   }
 
   const findNextButton = () =>
