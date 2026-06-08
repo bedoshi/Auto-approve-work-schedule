@@ -1,6 +1,6 @@
 jest.setTimeout(10000);
 
-const { sleep, waitForElement, waitForModalClose } = require('../utils');
+const { sleep, waitForElement, waitForButtonWithText, waitForModalClose } = require('../utils');
 
 describe('sleep', () => {
   beforeEach(() => {
@@ -42,6 +42,79 @@ describe('waitForElement', () => {
     await expect(waitForElement('#nonexistent', 200)).rejects.toThrow(
       '要素が見つかりません: #nonexistent (200ms 経過)'
     );
+  });
+});
+
+describe('waitForButtonWithText', () => {
+  beforeEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  test('テキストが一致するボタンが存在すれば即 resolve する', async () => {
+    const parent = document.createElement('div');
+    const btn = document.createElement('button');
+    btn.className = 'MuiButton-containedPrimary';
+    btn.textContent = '承認';
+    parent.appendChild(btn);
+    document.body.appendChild(parent);
+
+    const result = await waitForButtonWithText(parent, 'button.MuiButton-containedPrimary', '承認');
+    expect(result).toBe(btn);
+  });
+
+  test('タイムアウト内にボタンが現れれば resolve する', async () => {
+    const parent = document.createElement('div');
+    document.body.appendChild(parent);
+
+    setTimeout(() => {
+      const btn = document.createElement('button');
+      btn.className = 'MuiButton-containedPrimary';
+      btn.textContent = '承認';
+      parent.appendChild(btn);
+    }, 150);
+
+    const result = await waitForButtonWithText(parent, 'button.MuiButton-containedPrimary', '承認', 500);
+    expect(result.textContent).toBe('承認');
+  });
+
+  test('テキストが一致しないボタンは対象外', async () => {
+    const parent = document.createElement('div');
+    const btn = document.createElement('button');
+    btn.className = 'MuiButton-containedPrimary';
+    btn.textContent = '差戻';
+    parent.appendChild(btn);
+    document.body.appendChild(parent);
+
+    await expect(
+      waitForButtonWithText(parent, 'button.MuiButton-containedPrimary', '承認', 200)
+    ).rejects.toThrow('ボタンが見つかりません: "承認" (200ms 経過)');
+  });
+
+  test('タイムアウトすると reject する', async () => {
+    const parent = document.createElement('div');
+    document.body.appendChild(parent);
+
+    await expect(
+      waitForButtonWithText(parent, 'button.MuiButton-containedPrimary', '承認', 200)
+    ).rejects.toThrow('ボタンが見つかりません: "承認" (200ms 経過)');
+  });
+
+  test('documentを親として全体から検索できる', async () => {
+    const modal = document.createElement('div');
+    modal.className = 'MuiDialog-root';
+    modal.setAttribute('role', 'presentation');
+    const btn = document.createElement('button');
+    btn.className = 'MuiButton-containedPrimary';
+    btn.textContent = '承認';
+    modal.appendChild(btn);
+    document.body.appendChild(modal);
+
+    const result = await waitForButtonWithText(
+      document,
+      '.MuiDialog-root button.MuiButton-containedPrimary',
+      '承認'
+    );
+    expect(result).toBe(btn);
   });
 });
 
