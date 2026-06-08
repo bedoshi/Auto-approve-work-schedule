@@ -1,6 +1,6 @@
 async function runApproval() {
   // 日次ページの承認ボタンを全取得（テキストが「承認」のものに絞り込む）
-  const approvalButtons = Array.from(document.querySelectorAll('button.MuiButton-outlined'))
+  const approvalButtons = Array.from(document.querySelectorAll('button.MuiButton-containedPrimary'))
     .filter((btn) => btn.textContent.trim() === '承認');
 
   console.log(`Found ${approvalButtons.length} approval buttons`);
