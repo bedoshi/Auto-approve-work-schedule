@@ -17,58 +17,33 @@ async function runApproval() {
     return { success: false, message: '承認ボタンが見つかりませんでした' };
   }
 
-  let successCount = 0;
-  let failCount = 0;
-  let i = 0;
+  const approvalButton = findNextButton();
 
-  while (true) {
-    const approvalButton = findNextButton();
-    if (!approvalButton) break;
+  try {
+    const form = approvalButton.closest('form');
+    const workYMD = form?.querySelector('input[name="workYMD"]')?.value ?? '不明';
 
-    i++;
-    console.log(`Processing approval ${i}`);
+    approvalButton.click();
 
-    try {
-      // hidden input から日付を取得（ログ用）
-      const form = approvalButton.closest('form');
-      const workYMD = form?.querySelector('input[name="workYMD"]')?.value ?? '不明';
+    console.log('Waiting for modal confirm button');
+    const modalButton = await waitForButtonWithText(
+      document,
+      '.MuiDialog-root[role="presentation"] button.MuiButton-containedPrimary',
+      '承認'
+    );
 
-      // 承認ボタンをクリック
-      approvalButton.click();
+    console.log('Clicking confirm button');
+    modalButton.click();
 
-      // モーダル内の「承認」テキストを持つボタンが描画されるまで待つ
-      console.log('Waiting for modal confirm button');
-      const modalButton = await waitForButtonWithText(
-        document,
-        '.MuiDialog-root[role="presentation"] button.MuiButton-containedPrimary',
-        '承認'
-      );
+    await waitForModalClose();
+    console.log('Modal closed');
 
-      console.log('Clicking confirm button');
-      modalButton.click();
-
-      // モーダルが閉じるのを待つ
-      await waitForModalClose();
-      console.log('Modal closed');
-
-      // 次の処理前に 500ms 待機
-      await sleep(500);
-
-      successCount++;
-      console.log(`Approval ${i} completed (workYMD: ${workYMD})`);
-    } catch (err) {
-      failCount++;
-      console.error(`Approval ${i} failed: ${err.message}`);
-    }
+    console.log(`Approval completed (workYMD: ${workYMD})`);
+    return { success: true, message: '処理完了 - 成功: 1件' };
+  } catch (err) {
+    console.error(`Approval failed: ${err.message}`);
+    return { success: false, message: `処理失敗: ${err.message}` };
   }
-
-  console.log('All approvals processed');
-  console.log(`Success: ${successCount}, Failed: ${failCount}`);
-
-  return {
-    success: failCount === 0,
-    message: `処理完了 - 成功: ${successCount}件、失敗: ${failCount}件`,
-  };
 }
 
 if (typeof module !== 'undefined') {
