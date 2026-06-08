@@ -1,4 +1,11 @@
 async function runApproval() {
+  const hasScheduledBadge = Array.from(document.querySelectorAll('span'))
+    .some((el) => el.textContent.trim() === '予定申請済');
+
+  if (!hasScheduledBadge) {
+    return { success: false, message: '予定申請済が見つかりませんでした。承認処理を中止します。' };
+  }
+
   const findNextButton = () =>
     Array.from(document.querySelectorAll('button.MuiButton-containedPrimary'))
       .find((btn) => btn.textContent.trim() === '承認') ?? null;
